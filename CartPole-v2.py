@@ -51,34 +51,39 @@ def convert_observation_data(observation, env):
 def training(env):
 	global EPSILONE, L_R
 	score = 0
-	for i in range(TRINING_LEN):
-		total_reward = 0
-		observation = env.reset()
-		done = False
-		while not done:
-			state = convert_observation_data(observation, env)
-			# we select random move if random number < EPSILON and just in the first 75% game (exploring new moves).
-			if np.random.uniform(0, 1) < EPSILONE  and  i < TRINING_LEN - (TRINING_LEN / 4):
-				action = np.random.choice(env.action_space.n)
-			# Select action from table (EXPLOITING).
-			else: 
-				action = chose_action_from_table(state)
-			observation, reward, done, info = env.step(int(action))
-			# for every move our agent get 1 like a reward event in the last move, so we change the last move reward to PINALTI VALUE like.
-			if done and total_reward < SCORE_TO_ACHEIVE:
-				reward = PINALTY
-			updtae_q_table_value(observation, env, int(action), state, reward)
-			total_reward += reward
-			if done:
-				break
-		if total_reward >= SCORE_TO_ACHEIVE:
-			score += 1
-		# We decrease the Learning_rate and Epsilon value after each episode.
-		EPSILONE -= (EPSILONE / (TRINING_LEN))
-		L_R -= (L_R / TRINING_LEN)
-		if i and i % 1000 == 0:
-			print("Number of game where we achive the goal in 1000 game is {}".format(score))
-			score = 0
+	test_score = 0
+	while test_score  < 200:
+		for i in range(TRINING_LEN):
+			total_reward = 0
+			observation = env.reset()
+			done = False
+			while not done:
+				state = convert_observation_data(observation, env)
+				# we select random move if random number < EPSILON and just in the first 75% game (exploring new moves).
+				if np.random.uniform(0, 1) < EPSILONE  and  i < TRINING_LEN - (TRINING_LEN / 4):
+					action = np.random.choice(env.action_space.n)
+				# Select action from table (EXPLOITING).
+				else: 
+					action = chose_action_from_table(state)
+				observation, reward, done, info = env.step(int(action))
+				# for every move our agent get 1 like a reward event in the last move, so we change the last move reward to PINALTI VALUE like.
+				if done and total_reward < SCORE_TO_ACHEIVE:
+					reward = PINALTY
+				updtae_q_table_value(observation, env, int(action), state, reward)
+				total_reward += reward
+				if done:
+					break
+			if total_reward >= SCORE_TO_ACHEIVE:
+				score += 1
+			# We decrease the Learning_rate and Epsilon value after each episode.
+			EPSILONE -= (EPSILONE / (TRINING_LEN))
+			L_R -= (L_R / TRINING_LEN)
+			if i and i % 1000 == 0:
+				print("Number of game where we achive the goal in 1000 game is {}".format(score))
+				test_score = score
+				score = 0
+			if test_score  >= 200:
+				break;
 	print("\nFnish trining")
 
 
